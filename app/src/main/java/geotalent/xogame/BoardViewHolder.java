@@ -8,6 +8,9 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
+
 import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -59,6 +62,8 @@ public class BoardViewHolder implements View.OnClickListener {
 
     private Dialog dialog;
 
+    private YoYo.YoYoString animation;
+
     public BoardViewHolder(AppCompatActivity activity) {
         super();
         ButterKnife.bind(this, activity);
@@ -89,7 +94,7 @@ public class BoardViewHolder implements View.OnClickListener {
         dialog = new Dialog(view.getContext());
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_winner);
-        dialog.setCancelable(true);
+        dialog.setCanceledOnTouchOutside(false);
         ((TextView)dialog.findViewById(R.id.dialogMessage)).setText(String.format("Player %d is Winner",winCheck()));
         (dialog.findViewById(R.id.resetBtn)).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,6 +108,7 @@ public class BoardViewHolder implements View.OnClickListener {
 
     private void setPlayTurn(ImageView mark, Drawable drawable) {
         mark.setImageDrawable(drawable);
+        animation = YoYo.with(Techniques.BounceIn).playOn(mark);
     }
 
     private int winCheck() {
