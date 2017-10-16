@@ -1,4 +1,4 @@
-package geotalent.xogame;
+package geotalent.xogame.ViewHolder;
 
 import android.app.Dialog;
 import android.graphics.drawable.Drawable;
@@ -14,6 +14,7 @@ import com.daimajia.androidanimations.library.YoYo;
 import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import geotalent.xogame.R;
 
 /**
  * Created by dhero on 10/16/2017.
@@ -48,21 +49,30 @@ public class BoardViewHolder implements View.OnClickListener {
     @BindView(R.id.mark9)
     ImageView mark9;
 
+    @BindView(R.id.grid)
+    ImageView grid;
+
     @BindDrawable(R.drawable.cross)
     Drawable cross;
 
     @BindDrawable(R.drawable.circle)
     Drawable circle;
 
+    @BindView(R.id.player1)
+    TextView playerTxt1;
+
+    @BindView(R.id.player2)
+    TextView playerTxt2;
+
+    private YoYo.YoYoString playerAnimation1,playerAnimation2;
+
     private int player;
 
-    private Integer[][] winChk = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}, {1, 4, 5}, {2, 5, 8}, {3, 6, 9}, {1, 5, 9}, {3, 5, 7}};
+    private Integer[][] winChk = {{0, 1, 2}, {3, 4, 5}, {6, 7, 8}, {0, 3, 6}, {1, 4, 7}, {2, 5, 8}, {0, 4, 8}, {2, 4, 6}};
 
     private Integer[] boardPlay = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     private Dialog dialog;
-
-    private YoYo.YoYoString animation;
 
     public BoardViewHolder(AppCompatActivity activity) {
         super();
@@ -76,11 +86,11 @@ public class BoardViewHolder implements View.OnClickListener {
         int markPosition = Integer.parseInt(mark.getTag().toString());
         if (mark.getDrawable() == null) {
             if (player == 1) {
-                setPlayTurn(mark, cross);
+                setImageAndAnimation(mark, cross, player);
                 boardPlay[markPosition] = 1;
                 player = 2;
             } else if (player == 2) {
-                setPlayTurn(mark, circle);
+                setImageAndAnimation(mark, circle, player);
                 boardPlay[markPosition] = 2;
                 player = 1;
             }
@@ -90,12 +100,12 @@ public class BoardViewHolder implements View.OnClickListener {
         }
     }
 
-    private void showDialog(View view){
+    private void showDialog(View view) {
         dialog = new Dialog(view.getContext());
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_winner);
         dialog.setCanceledOnTouchOutside(false);
-        ((TextView)dialog.findViewById(R.id.dialogMessage)).setText(String.format("Player %d is Winner",winCheck()));
+        ((TextView) dialog.findViewById(R.id.dialogMessage)).setText(String.format("Player %d is Winner", winCheck()));
         (dialog.findViewById(R.id.resetBtn)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -106,20 +116,29 @@ public class BoardViewHolder implements View.OnClickListener {
         dialog.show();
     }
 
-    private void setPlayTurn(ImageView mark, Drawable drawable) {
+    private void setImageAndAnimation(ImageView mark, Drawable drawable, int player) {
         mark.setImageDrawable(drawable);
-        animation = YoYo.with(Techniques.BounceIn).playOn(mark);
+        YoYo.with(Techniques.BounceIn).playOn(mark);
+        if (player == 1){
+            playerAnimation2 = YoYo.with(Techniques.Bounce).repeat(YoYo.INFINITE).playOn(playerTxt2);
+            playerTxt2.setRotation(180);
+            playerAnimation1.stop();
+        }else if (player == 2){
+            playerAnimation1 = YoYo.with(Techniques.Bounce).repeat(YoYo.INFINITE).playOn(playerTxt1);
+            playerAnimation2.stop();
+            playerTxt2.setRotation(180);
+        }
     }
 
     private int winCheck() {
         for (Integer[] winchk : winChk) {
             if (boardPlay[winchk[0]] == 1 &&
-                    boardPlay[winchk[1]] == 1&&
-                    boardPlay[winchk[2]] == 1){
+                    boardPlay[winchk[1]] == 1 &&
+                    boardPlay[winchk[2]] == 1) {
                 return 1;
-            }else if (boardPlay[winchk[0]] == 2&&
-                    boardPlay[winchk[1]] == 2&&
-                    boardPlay[winchk[2]] == 2){
+            } else if (boardPlay[winchk[0]] == 2 &&
+                    boardPlay[winchk[1]] == 2 &&
+                    boardPlay[winchk[2]] == 2) {
                 return 2;
             }
         }
@@ -128,7 +147,7 @@ public class BoardViewHolder implements View.OnClickListener {
 
     private void setGame() {
         player = 1;
-        winChk = new Integer[][]{{0, 1, 2}, {3, 4, 5}, {6, 7, 8}, {0, 3, 4}, {1, 4, 7}, {2, 5, 8}, {0, 4, 8}, {2, 4, 6}};
+        winChk = new Integer[][]{{0, 1, 2}, {3, 4, 5}, {6, 7, 8}, {0, 3, 6}, {1, 4, 7}, {2, 5, 8}, {0, 4, 8}, {2, 4, 6}};
         boardPlay = new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
         mark1.setOnClickListener(this);
         mark2.setOnClickListener(this);
@@ -148,5 +167,11 @@ public class BoardViewHolder implements View.OnClickListener {
         mark7.setImageDrawable(null);
         mark8.setImageDrawable(null);
         mark9.setImageDrawable(null);
+        playerAnimation1 = YoYo.with(Techniques.Bounce).repeat(YoYo.INFINITE).playOn(playerTxt1);
+        YoYo.with(Techniques.FadeIn).playOn(grid);
+        if (playerAnimation2 != null){
+            playerAnimation2.stop();
+        }
+        playerTxt2.setRotation(180);
     }
 }

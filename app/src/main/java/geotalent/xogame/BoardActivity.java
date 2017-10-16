@@ -3,6 +3,8 @@ package geotalent.xogame;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import geotalent.xogame.ViewHolder.BoardViewHolder;
+
 public class BoardActivity extends AppCompatActivity {
     BoardViewHolder view;
 
