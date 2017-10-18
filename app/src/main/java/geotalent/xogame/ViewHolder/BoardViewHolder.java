@@ -12,13 +12,10 @@ import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 
 import butterknife.BindDrawable;
+import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import geotalent.xogame.R;
-
-/**
- * Created by dhero on 10/16/2017.
- */
 
 public class BoardViewHolder implements View.OnClickListener {
 
@@ -64,15 +61,29 @@ public class BoardViewHolder implements View.OnClickListener {
     @BindView(R.id.player2)
     TextView playerTxt2;
 
+    @BindString(R.string.player1)
+    String player1;
+
+    @BindString(R.string.player2)
+    String player2;
+
+    @BindString(R.string.win)
+    String win;
+
+    @BindString(R.string.draw)
+    String draw;
+
     private YoYo.YoYoString playerAnimation1,playerAnimation2;
 
-    private int player;
+    private int player,countDraw = 0;
 
     private Integer[][] winChk = {{0, 1, 2}, {3, 4, 5}, {6, 7, 8}, {0, 3, 6}, {1, 4, 7}, {2, 5, 8}, {0, 4, 8}, {2, 4, 6}};
 
     private Integer[] boardPlay = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     private Dialog dialog;
+
+    private String message = draw;
 
     public BoardViewHolder(AppCompatActivity activity) {
         super();
@@ -94,9 +105,10 @@ public class BoardViewHolder implements View.OnClickListener {
                 boardPlay[markPosition] = 2;
                 player = 1;
             }
-            if (winCheck() > 0) {
+            if (winCheck() || countDraw == 8) {
                 showDialog(view);
             }
+            countDraw++;
         }
     }
 
@@ -105,7 +117,7 @@ public class BoardViewHolder implements View.OnClickListener {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_winner);
         dialog.setCanceledOnTouchOutside(false);
-        ((TextView) dialog.findViewById(R.id.dialogMessage)).setText(String.format("Player %d is Winner", winCheck()));
+        ((TextView) dialog.findViewById(R.id.dialogMessage)).setText(message);
         (dialog.findViewById(R.id.resetBtn)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -130,23 +142,27 @@ public class BoardViewHolder implements View.OnClickListener {
         }
     }
 
-    private int winCheck() {
+    private boolean winCheck() {
         for (Integer[] winchk : winChk) {
             if (boardPlay[winchk[0]] == 1 &&
                     boardPlay[winchk[1]] == 1 &&
                     boardPlay[winchk[2]] == 1) {
-                return 1;
+                message = player1 +" "+win;
+                return true;
             } else if (boardPlay[winchk[0]] == 2 &&
                     boardPlay[winchk[1]] == 2 &&
                     boardPlay[winchk[2]] == 2) {
-                return 2;
+                message = player2 +" "+win;
+                return true;
             }
         }
-        return 0;
+        return false;
     }
 
     private void setGame() {
         player = 1;
+        message = draw;
+        countDraw = 0;
         winChk = new Integer[][]{{0, 1, 2}, {3, 4, 5}, {6, 7, 8}, {0, 3, 6}, {1, 4, 7}, {2, 5, 8}, {0, 4, 8}, {2, 4, 6}};
         boardPlay = new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
         mark1.setOnClickListener(this);
@@ -167,11 +183,13 @@ public class BoardViewHolder implements View.OnClickListener {
         mark7.setImageDrawable(null);
         mark8.setImageDrawable(null);
         mark9.setImageDrawable(null);
-        playerAnimation1 = YoYo.with(Techniques.Bounce).repeat(YoYo.INFINITE).playOn(playerTxt1);
-        YoYo.with(Techniques.FadeIn).playOn(grid);
         if (playerAnimation2 != null){
+            playerAnimation1.stop();
             playerAnimation2.stop();
         }
+        playerAnimation1 = YoYo.with(Techniques.Bounce).repeat(YoYo.INFINITE).playOn(playerTxt1);
+        YoYo.with(Techniques.FadeIn).playOn(grid);
         playerTxt2.setRotation(180);
     }
+
 }
