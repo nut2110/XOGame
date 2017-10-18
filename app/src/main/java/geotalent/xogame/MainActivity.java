@@ -31,4 +31,9 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(MainActivity.this,BoardActivity.class));
     }
 
+    @OnClick(R.id.btnExit)
+    void onBtnExit(){
+        onBackPressed();
+    }
+
 }

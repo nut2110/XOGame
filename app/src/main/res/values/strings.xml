@@ -8,5 +8,6 @@
     <string name="draw">Draw!</string>
 
     <string name="play">Play</string>
+    <string name="exit">Exit</string>
 
 </resources>
